@@ -12,7 +12,16 @@ exports.registerUser = async (req, res) => {
     }
 
     const hashedPassword = await bcrypt.hash(password, 10);
-    const user = new User({ name, email, password: hashedPassword, role });
+
+    const userId = `${role.charAt(0)}${Date.now()}`;
+
+
+    const existingUserId = await User.findOne({ userId });
+    if (existingUserId) {
+      return res.status(400).json({ message: "User ID conflict. Please try again later." });
+    }
+
+    const user = new User({ name, email, password: hashedPassword, role, userId });
     await user.save();
 
     const token = jwt.sign(
@@ -32,6 +41,8 @@ exports.registerUser = async (req, res) => {
       }
     });
   } catch (error) {
+    console.error("Error registering user:", error);
+
     res.status(500).json({ message: "Error registering user", error: error.message });
   }
 };
@@ -67,6 +78,8 @@ exports.loginUser = async (req, res) => {
       }
     });
   } catch (error) {
+    console.log("Error in logging in", error);
+    
     res.status(500).json({ message: "Error logging in", error: error.message });
   }
 };

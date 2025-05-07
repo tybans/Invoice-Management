@@ -7,13 +7,28 @@ exports.createUser = async (req, res) => {
 
   try {
     const userId = `${role.charAt(0)}${Date.now()}`;
-    const newUser = new User({ name, email, role, password: hashedPassword, userId });
+
+    const existingUserId = await User.findOne({ userId });
+    if (existingUserId) {
+      return res
+        .status(400)
+        .json({ message: "User ID already exists, try again" });
+    }
+
+    const newUser = new User({
+      name,
+      email,
+      role,
+      password: hashedPassword,
+      userId,
+    });
     await newUser.save();
     res.status(201).json(newUser);
   } catch (error) {
+    console.error(error);
     res.status(500).json({
       message: "Error creating user!",
-      error
+      error,
     });
   }
 };
@@ -22,12 +37,16 @@ exports.updateUserRole = async (req, res) => {
   const { userId } = req.params;
   const { role } = req.body;
   try {
-    const updatedUser = await User.findOneAndUpdate({ userId }, { role }, { new: true });
+    const updatedUser = await User.findOneAndUpdate(
+      { userId },
+      { role },
+      { new: true }
+    );
     res.status(200).json(updatedUser);
   } catch (error) {
     res.status(500).json({
       message: "Error updating user role",
-      error
+      error,
     });
   }
 };
@@ -40,7 +59,7 @@ exports.deleteUser = async (req, res) => {
   } catch (error) {
     res.status(500).json({
       message: "Error deleting user!",
-      error
+      error,
     });
   }
 };
@@ -48,12 +67,14 @@ exports.deleteUser = async (req, res) => {
 exports.getUsers = async (req, res) => {
   const { page = 1, limit = 10 } = req.query;
   try {
-    const users = await User.find().skip((page - 1) * limit).limit(limit);
+    const users = await User.find()
+      .skip((page - 1) * limit)
+      .limit(limit);
     res.status(200).json(users);
   } catch (error) {
     res.status(500).json({
       message: "Error fetching users",
-      error
+      error,
     });
   }
 };
