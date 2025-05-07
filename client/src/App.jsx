@@ -13,7 +13,7 @@ const App = () => {
 
   const getInitialRoute = () => {
     if (user?.role === "ADMIN") return "/users";
-    if (user?.role === "UNIT MANAGER" || user?.role === "USER") return "/invoices";
+    if (user?.role === "UNIT_MANAGER" || user?.role === "USER") return "/invoices";
     return "/signup"; // default for non-authenticated users
   };
 

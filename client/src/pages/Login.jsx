@@ -1,10 +1,9 @@
 import React, { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, Link } from "react-router-dom";
 import { BASE_URL } from "../utils/constant";
 import { useInvoiceContext } from "../context/InvoiceContext";
 import Input from "../components/Input";
 import { setToken } from "../utils/utils";
-import { Link } from "react-router-dom";
 
 const Login = () => {
   const [form, setForm] = useState({ email: "", password: "" });
@@ -15,8 +14,6 @@ const Login = () => {
   const handleChange = (e) => {
     setForm({ ...form, [e.target.name]: e.target.value });
   };
-
-  console.log("Submitting login with:", form);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -33,19 +30,15 @@ const Login = () => {
         throw new Error(data.message || "Login failed");
       }
 
-      
       console.log("Login successful:", data);
+      // setToken(data.token);
+      login({ token: data.token, user: data.user });
 
-      setToken(data.token);
-      login(data.user); // Update context
-
-      // Safety log to confirm role
-      console.log("Navigating for role:", data.user.role);
-
+      // Navigate based on role
       navigate(
         data.user.role === "ADMIN"
           ? "/users"
-          : data.user.role === "UNIT MANAGER" || data.user.role === "USER"
+          : data.user.role === "UNIT_MANAGER" || data.user.role === "USER"
           ? "/invoices"
           : "/"
       );
@@ -93,6 +86,7 @@ const Login = () => {
         >
           Login
         </button>
+
         <p className="text-sm text-center mt-2">
           New user?{" "}
           <Link to="/signup" className="text-blue-600 underline">
