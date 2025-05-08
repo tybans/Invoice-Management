@@ -1,5 +1,5 @@
 
-export const BASE_URL = "http://localhost:5000/api";
+export const BASE_URL = "https://invoice-management-backend-1w7v.onrender.com";
 
 export const USER_ROLES = ["ADMIN", "UNIT_MANAGER", "USER"];
 
